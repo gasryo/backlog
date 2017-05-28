@@ -1,0 +1,2 @@
+GET  /issues/         com.example.backlog.infrastructure.play.controller.IssueController.index
+GET  /issues/search/  com.example.backlog.infrastructure.play.controller.IssueController.search
