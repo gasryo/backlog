@@ -16,7 +16,7 @@ class IssueController @Inject()(val messagesApi: MessagesApi) extends Controller
   val issueSearchForm = Form(
     mapping(
       "iDisplayStart"  -> longNumber,
-      "iDisplayLength" -> number,
+      "iDisplayLength" -> number(min = 1, max = 100),
       "sSearch"        -> optional(text),
       "sEcho"          -> text
     )(IssueSearchForm.apply)(IssueSearchForm.unapply)

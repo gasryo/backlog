@@ -20,8 +20,8 @@ object ApiIssueSearchRepository extends IssueSearchRepository {
     getIssuesParams.offset(issueSearchConditionEntity.offset)
     getIssuesParams.count(issueSearchConditionEntity.count)
     issueSearchConditionEntity.keyword.foreach(getIssuesParams.keyword(_))
-    val issues = api.client.getIssues(getIssuesParams)
-    for (issue <- issues) yield IssueEntity(
+
+    for (issue <- api.client.getIssues(getIssuesParams)) yield IssueEntity(
       id          = issue.getId,
       projectId   = issue.getProjectId,
       issueKey    = issue.getIssueKey,
