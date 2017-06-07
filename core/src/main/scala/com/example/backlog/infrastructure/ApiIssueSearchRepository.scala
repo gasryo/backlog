@@ -1,11 +1,12 @@
 package com.example.backlog.infrastructure
 
-import com.example.backlog.common.ApiContainer
+import java.time.ZoneId
+
+import com.example.backlog.common.Api
 import com.example.backlog.domain.model.entity._
 import com.example.backlog.domain.model.valueobject._
 import com.example.backlog.domain.repository._
 import com.nulabinc.backlog4j.api.option.{GetIssuesCountParams, GetIssuesParams}
-import org.joda.time.DateTime
 
 import collection.JavaConversions._
 import scala.collection.mutable._
@@ -14,8 +15,8 @@ trait MixinApiIssueSearchRepository extends UsingIssueSearchRepository {
   val issueRepository: IssueSearchRepository = ApiIssueSearchRepository
 }
 
-object ApiIssueSearchRepository extends IssueSearchRepository {
-  def getIssues(issueSearchConditionEntity: IssueSearchConditionEntity)(implicit api: ApiContainer): Seq[IssueEntity] = {
+object ApiIssueSearchRepository extends IssueSearchRepository with Api {
+  def getIssues(issueSearchConditionEntity: IssueSearchConditionEntity): Seq[IssueEntity] = {
     val getIssuesParams = new GetIssuesParams(api.getProjectIds)
     getIssuesParams.offset(issueSearchConditionEntity.offset)
     getIssuesParams.count(issueSearchConditionEntity.count)
@@ -39,18 +40,18 @@ object ApiIssueSearchRepository extends IssueSearchRepository {
         id = issue.getStatus.getId,
         name = issue.getStatus.getName
       ),
-      startDate   = if(issue.getStartDate == null) None else Some(new DateTime(issue.getStartDate)),
-      dueDate     = if(issue.getDueDate == null) None else Some(new DateTime(issue.getDueDate))
+      startDate   = if(issue.getStartDate == null) None else Some(issue.getStartDate.toInstant().atZone(ZoneId.systemDefault())),
+      dueDate     = if(issue.getDueDate == null) None else Some(issue.getDueDate.toInstant().atZone(ZoneId.systemDefault()))
     )
   }
 
-  def getIssuesCount(issueSearchConditionEntity: IssueSearchConditionEntity)(implicit api: ApiContainer): Int = {
+  def getIssuesCount(issueSearchConditionEntity: IssueSearchConditionEntity): Int = {
     val getIssuesCountParams = new GetIssuesCountParams(api.getProjectIds)
     issueSearchConditionEntity.keyword.foreach(getIssuesCountParams.keyword(_))
     api.client.getIssuesCount(getIssuesCountParams)
   }
 
-  def getIssuesAllCount(issueSearchConditionEntity: IssueSearchConditionEntity)(implicit api: ApiContainer): Int = {
+  def getIssuesAllCount(issueSearchConditionEntity: IssueSearchConditionEntity): Int = {
     val getIssuesCountParams = new GetIssuesCountParams(api.getProjectIds)
     api.client.getIssuesCount(getIssuesCountParams)
   }
